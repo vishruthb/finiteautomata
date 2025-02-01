@@ -5,7 +5,7 @@ class FiniteAutomata:
         self.states = set()
         self.start_state = None
         self.accept_states = set()
-        self.transitions = []  # List of tuples: (from_state, symbol, to_state)
+        self.transitions = []  # (from_state, symbol, to_state)
 
     def state(self, state):
         """Add a state to the automata."""
@@ -44,20 +44,15 @@ class FiniteAutomata:
         """
         dot = Digraph(name='FiniteAutomata', format=format)
         dot.attr(rankdir='LR')
-
-        # Add an invisible starting node to point to the start state.
         dot.node('', shape='none')
 
-        # Create nodes for each state.
         for state in self.states:
             shape = 'doublecircle' if state in self.accept_states else 'circle'
             dot.node(state, shape=shape)
 
-        # Draw an edge from the invisible node to the start state.
         if self.start_state:
             dot.edge('', self.start_state)
 
-        # Group transitions between the same states.
         grouped = {}
         for from_state, symbol, to_state in self.transitions:
             key = (from_state, to_state)
