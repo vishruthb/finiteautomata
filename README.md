@@ -1,4 +1,4 @@
-# falib
+# fiauto
 
 A Python library for creating finite automata diagrams with intuitive syntax.
 

@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='falib',
+    name='fiauto',
     version='0.1.0',
     description='A Python library for creating finite automata diagrams with intuitive syntax.',
-    author='Your Name',
-    author_email='your.email@example.com',
+    author='Vishruth Bharath',
+    author_email='',
     packages=find_packages(),
     install_requires=[
         'graphviz',

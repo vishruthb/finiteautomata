@@ -64,5 +64,3 @@ class FiniteAutomata:
 
         dot.render(filename, view=view)
         return dot
-
-
