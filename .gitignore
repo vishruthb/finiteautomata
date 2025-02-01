@@ -1,0 +1,57 @@
+# Python
+*.py[cod]
+__pycache__/
+*.so
+dist/
+build/
+*.egg
+*.egg-info/
+eggs/
+develop-eggs/
+.eggs/
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# VSCode
+.vscode/
+.history/
+*.code-workspace
+
+# MacOS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Coverage and Testing
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.pytest_cache/
+.hypothesis/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.*.sw[a-p]
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Local development settings
+local_settings.py
+
