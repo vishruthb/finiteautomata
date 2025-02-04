@@ -1,4 +1,4 @@
-# fin-auto
+# finiteautomata
 
 A more intuitive way to create finite automata diagrams.
 
@@ -11,13 +11,13 @@ A more intuitive way to create finite automata diagrams.
 ## Installation
 
 ```bash
-pip install fin-auto
+pip install finiteautomata
 ```
 
-To use the fin-auto package in your code:
+To use the finiteautomata package in your code:
 
 ```python
-from fin_auto import FiniteAutomata
+from finiteautomata import FiniteAutomata
 
 # Create instance of FiniteAutomata
 fsm = FiniteAutomata()

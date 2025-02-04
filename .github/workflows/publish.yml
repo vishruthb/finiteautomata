@@ -1,0 +1,36 @@
+name: Publish to PyPI 🚀
+
+on:
+  push:
+    tags:
+      - "v*.*.*"  # Only publish on versioned tags like v1.0.0
+
+jobs:
+  publish:
+    name: Build & Publish to PyPI
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write  # Required for trusted publishing
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/finiteautomata
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install build dependencies
+        run: pip install build
+
+      - name: Build package
+        run: python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
