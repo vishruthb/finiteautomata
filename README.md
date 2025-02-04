@@ -1,12 +1,25 @@
-# fiauto
+# fin-auto
 
-A Python library for creating finite automata diagrams with intuitive syntax.
+A more intuitive way to create finite automata diagrams.
 
 ## Features
 
 - Define start, accept, and intermediate states.
-- Add transitions (including self-loops).
-- Render state diagrams using Graphviz.
+- Add transitions (including self-loops), can also chain multiple transitions.
+- Render state diagrams (using Graphviz under the hood).
+
+## Installation
+
+```bash
+pip install fin-auto
+```
+
+```python
+from fin_auto import FiniteAutomata
+
+# Create instance of FiniteAutomata
+fsm = FiniteAutomata()
+```
 
 ## Syntax Documentation
 

@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='fiauto',
-    version='0.1.0',
-    description='A Python library for creating finite automata diagrams with intuitive syntax.',
+    name='fin-auto',
+    version='0.1.2',
+    description='A more intuitive way to create finite automata diagrams.',
     author='Vishruth Bharath',
     author_email='',
     packages=find_packages(),
