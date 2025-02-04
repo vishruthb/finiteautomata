@@ -14,6 +14,8 @@ A more intuitive way to create finite automata diagrams.
 pip install fin-auto
 ```
 
+To use the fin-auto package in your code:
+
 ```python
 from fin_auto import FiniteAutomata
 
