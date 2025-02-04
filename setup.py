@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='finiteautomata',
-    version='0.1.2',
+    version='0.1.3',
     description='A more intuitive way to create finite automata diagrams.',
     author='Vishruth Bharath',
     author_email='',
