@@ -1,4 +1,7 @@
 from graphviz import Digraph
+import os
+import platform
+import shutil
 
 class FiniteAutomata:
     def __init__(self):
@@ -34,6 +37,23 @@ class FiniteAutomata:
         self.state(to_state)
         self.transitions.append((from_state, symbol, to_state))
         return self
+    
+    def _windows_util(self):
+            """Check for Graphviz 'dot' executable and attempt Windows-specific fixes."""
+            if not shutil.which("dot"):
+                if platform.system() == "Windows":
+                    default_path = r"C:\Program Files\Graphviz\bin"
+                    if os.path.isdir(default_path):
+                        os.environ["PATH"] += os.pathsep + default_path
+                    if not shutil.which("dot"):
+                        raise RuntimeError(
+                            "Graphviz 'dot' executable not found. Please install Graphviz "
+                            "and add its bin folder to your PATH (e.g., C:\\Program Files\\Graphviz\\bin)."
+                        )
+                else:
+                    raise RuntimeError(
+                        "Graphviz 'dot' executable not found. Please install Graphviz and ensure it is in your PATH."
+                    )
 
     def draw(self, filename='fsm', format='png', view=False):
         """
@@ -42,6 +62,8 @@ class FiniteAutomata:
         - format: output file format (png, pdf, etc.)
         - view: if True, automatically open the generated diagram.
         """
+        self._windows_util()
+
         dot = Digraph(name='FiniteAutomata', format=format)
         dot.attr(rankdir='LR')
         dot.node('', shape='none')
