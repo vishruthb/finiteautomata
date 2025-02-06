@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='finiteautomata',
-    version='0.1.5',
+    version='0.2.0',
     description='A more intuitive way to create finite automata diagrams.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
