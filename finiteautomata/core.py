@@ -39,21 +39,19 @@ class FiniteAutomata:
         return self
     
     def _windows_util(self):
-            """Check for Graphviz 'dot' executable and attempt Windows-specific fixes."""
-            if not shutil.which("dot"):
-                if platform.system() == "Windows":
-                    default_path = r"C:\Program Files\Graphviz\bin"
-                    if os.path.isdir(default_path):
-                        os.environ["PATH"] += os.pathsep + default_path
-                    if not shutil.which("dot"):
-                        raise RuntimeError(
-                            "Graphviz 'dot' executable not found. Please install Graphviz "
-                            "and add its bin folder to your PATH (e.g., C:\\Program Files\\Graphviz\\bin)."
-                        )
-                else:
+        """Check for Graphviz 'dot' executable and attempt Windows-specific fixes."""
+        if not shutil.which("dot"):
+            if platform.system() == "Windows":
+                default_path = r"C:\Program Files\Graphviz\bin"
+                if os.path.isdir(default_path):
+                    os.environ["PATH"] += os.pathsep + default_path
+                if not shutil.which("dot"):
                     raise RuntimeError(
-                        "Graphviz 'dot' executable not found. Please install Graphviz and ensure it is in your PATH."
+                        "Graphviz 'dot' executable not found. Please install Graphviz "
+                        "and add its bin folder to your PATH (e.g., C:\\Program Files\\Graphviz\\bin)."
                     )
+            else:
+                pass # TODO: Add Linux and Apple ARM support
 
     def draw(self, filename='fsm', format='png', view=False):
         """
