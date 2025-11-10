@@ -10,9 +10,11 @@ setup(
     author='Vishruth Bharath',
     author_email='',
     packages=find_packages(),
-    install_requires=[
-        'graphviz',
-    ],
+    install_requires=[],
+    extras_require={
+        'cairo': ['cairosvg>=2.7'],
+        'dev': ['pytest>=7.0', 'pytest-cov>=4.0', 'cairosvg>=2.7'],
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',

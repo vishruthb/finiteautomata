@@ -1,7 +1,9 @@
-from graphviz import Digraph
-import os
-import platform
-import shutil
+from typing import Iterable, Optional, Sequence, TYPE_CHECKING
+
+from .renderer import AutomataRenderer, RendererConfig
+
+if TYPE_CHECKING:
+    from .renderer import RendererTheme
 
 class FiniteAutomata:
     def __init__(self):
@@ -9,6 +11,7 @@ class FiniteAutomata:
         self.start_state = None
         self.accept_states = set()
         self.transitions = []  # (from_state, symbol, to_state)
+        self.renderer_config = RendererConfig()
 
     def state(self, state):
         """Add a state to the automata."""
@@ -38,80 +41,83 @@ class FiniteAutomata:
         self.transitions.append((from_state, symbol, to_state))
         return self
     
-    def _ensure_graphviz(self):
-        """Ensure Graphviz 'dot' executable is discoverable across supported platforms."""
-        if shutil.which("dot"):
-            return
+    def configure_renderer(
+        self,
+        *,
+        formats: Optional[Sequence[str]] = None,
+        theme: Optional["RendererTheme"] = None,
+        canvas_padding: Optional[int] = None,
+        horizontal_gap: Optional[int] = None,
+        vertical_gap: Optional[int] = None,
+        state_radius: Optional[int] = None,
+    ):
+        """
+        Update the rendering configuration.
 
-        system = platform.system()
+        - formats: iterable of output formats to use when draw() is called without overrides.
+        - theme: RendererTheme instance to customize colors and typography.
+        - numeric parameters adjust spacing and sizing heuristics.
+        """
+        if formats is not None:
+            self.renderer_config.formats = tuple(formats)
+        if theme is not None:
+            self.renderer_config.theme = theme
+        if canvas_padding is not None:
+            self.renderer_config.canvas_padding = canvas_padding
+        if horizontal_gap is not None:
+            self.renderer_config.horizontal_gap = horizontal_gap
+        if vertical_gap is not None:
+            self.renderer_config.vertical_gap = vertical_gap
+        if state_radius is not None:
+            self.renderer_config.state_radius = state_radius
+        return self
 
-        if system == "Windows":
-            default_paths = [
-                r"C:\Program Files\Graphviz\bin",
-                r"C:\Program Files (x86)\Graphviz\bin",
-            ]
-            for path in default_paths:
-                if os.path.isdir(path):
-                    os.environ["PATH"] += os.pathsep + path
-                    if shutil.which("dot"):
-                        return
-            raise RuntimeError(
-                "Graphviz 'dot' executable not found. Install Graphviz from "
-                "https://graphviz.org/download/ and ensure its 'bin' directory "
-                "is on your PATH (e.g., C:\\Program Files\\Graphviz\\bin)."
-            )
+    def draw(
+        self,
+        filename: str = 'fsm',
+        *,
+        format: Optional[str] = None,
+        formats: Optional[Iterable[str]] = None,
+        view: bool = False,
+        theme: Optional["RendererTheme"] = None,
+    ):
+        """
+        Render the automata using the custom rendering engine.
 
-        if system == "Darwin":
-            potential_paths = [
-                "/opt/homebrew/bin",  # Apple Silicon Homebrew default
-                "/usr/local/bin",     # Intel Homebrew default
-                "/opt/local/bin",     # MacPorts
-            ]
-            for path in potential_paths:
-                if os.path.isdir(path):
-                    os.environ["PATH"] += os.pathsep + path
-                    if shutil.which("dot"):
-                        return
-            raise RuntimeError(
-                "Graphviz 'dot' executable not found on macOS. Install via "
-                "`brew install graphviz` (Apple Silicon users may need to install Homebrew) "
-                "or ensure the Graphviz binaries are on your PATH."
-            )
+        - filename: base filename used for outputs
+        - format: legacy single-format parameter (superseded by `formats`)
+        - formats: iterable of requested formats (svg, png, html)
+        - view: automatically open the first generated artifact
+        - theme: optional RendererTheme to override colors for this render
+        """
+        selected_formats: Sequence[str]
+        if formats is not None:
+            selected_formats = tuple(formats)
+        elif format is not None:
+            selected_formats = (format,)
+        else:
+            selected_formats = self.renderer_config.formats
 
-        raise RuntimeError(
-            "Graphviz 'dot' executable not found. Install Graphviz using your "
-            "distribution's package manager (e.g., `sudo apt install graphviz`) "
-            "or ensure the executable is on your PATH."
+        renderer = AutomataRenderer(
+            self.states,
+            self.start_state,
+            self.accept_states,
+            self.transitions,
+            config=self._effective_config(theme),
         )
+        outputs = renderer.render(filename, selected_formats, view=view)
+        return outputs
 
-    def draw(self, filename='fsm', format='png', view=False):
-        """
-        Render the automata as a diagram.
-        - filename: the output filename (without extension)
-        - format: output file format (png, pdf, etc.)
-        - view: if True, automatically open the generated diagram.
-        """
-        self._ensure_graphviz()
-
-        dot = Digraph(name='FiniteAutomata', format=format)
-        dot.attr(rankdir='LR')
-        dot.node('', shape='none')
-
-        for state in self.states:
-            shape = 'doublecircle' if state in self.accept_states else 'circle'
-            dot.node(state, shape=shape)
-
-        if self.start_state:
-            dot.edge('', self.start_state)
-
-        grouped = {}
-        for from_state, symbol, to_state in self.transitions:
-            key = (from_state, to_state)
-            grouped.setdefault(key, []).append(symbol)
-
-        for (from_state, to_state), symbols in grouped.items():
-            label = ', '.join(symbols)
-            dot.edge(from_state, to_state, label=label)
-
-        dot.render(filename, view=view)
-        return dot
+    def _effective_config(self, theme_override: Optional["RendererTheme"]) -> RendererConfig:
+        if theme_override is None:
+            return self.renderer_config
+        config_copy = RendererConfig(
+            formats=self.renderer_config.formats,
+            theme=theme_override,
+            canvas_padding=self.renderer_config.canvas_padding,
+            horizontal_gap=self.renderer_config.horizontal_gap,
+            vertical_gap=self.renderer_config.vertical_gap,
+            state_radius=self.renderer_config.state_radius,
+            arrow_size=self.renderer_config.arrow_size,
+        )
+        return config_copy
