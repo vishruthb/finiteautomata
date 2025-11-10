@@ -1,4 +1,4 @@
-from fiauto import FiniteAutomata
+from finiteautomata import FiniteAutomata
 
 def main():
     fsm = FiniteAutomata()

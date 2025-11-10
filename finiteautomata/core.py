@@ -38,20 +38,51 @@ class FiniteAutomata:
         self.transitions.append((from_state, symbol, to_state))
         return self
     
-    def _windows_util(self):
-        """Check for Graphviz 'dot' executable and attempt Windows-specific fixes."""
-        if not shutil.which("dot"):
-            if platform.system() == "Windows":
-                default_path = r"C:\Program Files\Graphviz\bin"
-                if os.path.isdir(default_path):
-                    os.environ["PATH"] += os.pathsep + default_path
-                if not shutil.which("dot"):
-                    raise RuntimeError(
-                        "Graphviz 'dot' executable not found. Please install Graphviz "
-                        "and add its bin folder to your PATH (e.g., C:\\Program Files\\Graphviz\\bin)."
-                    )
-            else:
-                pass # TODO: Add Linux and Apple ARM support
+    def _ensure_graphviz(self):
+        """Ensure Graphviz 'dot' executable is discoverable across supported platforms."""
+        if shutil.which("dot"):
+            return
+
+        system = platform.system()
+
+        if system == "Windows":
+            default_paths = [
+                r"C:\Program Files\Graphviz\bin",
+                r"C:\Program Files (x86)\Graphviz\bin",
+            ]
+            for path in default_paths:
+                if os.path.isdir(path):
+                    os.environ["PATH"] += os.pathsep + path
+                    if shutil.which("dot"):
+                        return
+            raise RuntimeError(
+                "Graphviz 'dot' executable not found. Install Graphviz from "
+                "https://graphviz.org/download/ and ensure its 'bin' directory "
+                "is on your PATH (e.g., C:\\Program Files\\Graphviz\\bin)."
+            )
+
+        if system == "Darwin":
+            potential_paths = [
+                "/opt/homebrew/bin",  # Apple Silicon Homebrew default
+                "/usr/local/bin",     # Intel Homebrew default
+                "/opt/local/bin",     # MacPorts
+            ]
+            for path in potential_paths:
+                if os.path.isdir(path):
+                    os.environ["PATH"] += os.pathsep + path
+                    if shutil.which("dot"):
+                        return
+            raise RuntimeError(
+                "Graphviz 'dot' executable not found on macOS. Install via "
+                "`brew install graphviz` (Apple Silicon users may need to install Homebrew) "
+                "or ensure the Graphviz binaries are on your PATH."
+            )
+
+        raise RuntimeError(
+            "Graphviz 'dot' executable not found. Install Graphviz using your "
+            "distribution's package manager (e.g., `sudo apt install graphviz`) "
+            "or ensure the executable is on your PATH."
+        )
 
     def draw(self, filename='fsm', format='png', view=False):
         """
@@ -60,7 +91,7 @@ class FiniteAutomata:
         - format: output file format (png, pdf, etc.)
         - view: if True, automatically open the generated diagram.
         """
-        self._windows_util()
+        self._ensure_graphviz()
 
         dot = Digraph(name='FiniteAutomata', format=format)
         dot.attr(rankdir='LR')
